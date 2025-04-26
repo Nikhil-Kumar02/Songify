@@ -10,7 +10,7 @@ import { createServer } from "http";
 import { initializeSocket } from "./lib/socket.js";
 
 import cron from "node-cron";
-import fs from "fs"
+import fs from "fs";
 
 import { clerkMiddleware } from "@clerk/express";
 import { connectDB } from "./lib/db.js";
@@ -24,8 +24,8 @@ import albumRoutes from "./routes/album.route.js";
 
 dotenv.config();
 
-const app = express();
 const __dirname = path.resolve();
+const app = express();
 const PORT = process.env.PORT;
 
 const httpServer = createServer(app);
@@ -33,28 +33,26 @@ initializeSocket(httpServer);
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // your frontend URL
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
 
-app.use(express.json()); // TO parse req.body
-app.use(cookieParser()); // ✅ must come before Clerk middleware
-app.use(clerkMiddleware()); // This will add auth to req object => req.auth
-
+app.use(express.json()); // to parse req.body
+app.use(clerkMiddleware()); // this will add auth to req obj => req.auth
 app.use(
-  fileupload({
+  fileUpload({
     useTempFiles: true,
-    tempFileDir: path.join(__dirname, "temp"),
+    tempFileDir: path.join(__dirname, "tmp"),
     createParentPath: true,
     limits: {
-      fileSize: 10 * 1024 * 1024, // 10MB max file size
+      fileSize: 10 * 1024 * 1024, // 10MB  max file size
     },
   })
-); // For file upload
+);
 
-// cran jobs
-const tempDir = path.join(process.cwd(), "temp");
+// cron jobs
+const tempDir = path.join(process.cwd(), "tmp");
 cron.schedule("0 * * * *", () => {
   if (fs.existsSync(tempDir)) {
     fs.readdir(tempDir, (err, files) => {
@@ -70,8 +68,8 @@ cron.schedule("0 * * * *", () => {
 });
 
 app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/songs", songRoutes);
 app.use("/api/albums", albumRoutes);
 app.use("/api/stats", statRoutes);
@@ -83,14 +81,16 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-// Error Handler
+// error handler
 app.use((err, req, res, next) => {
-  res.status(500).json({
-    message:
-      process.env.NODE_ENV === "production"
-        ? "Internal Sever Error"
-        : err.message,
-  });
+  res
+    .status(500)
+    .json({
+      message:
+        process.env.NODE_ENV === "production"
+          ? "Internal server error"
+          : err.message,
+    });
 });
 
 httpServer.listen(PORT, () => {
