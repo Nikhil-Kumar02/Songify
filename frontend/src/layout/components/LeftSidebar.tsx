@@ -1,4 +1,4 @@
-import { HomeIcon, Library, MessageCircle } from "lucide-react";
+import { HomeIcon, Library, MessageCircle, PlusIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "../../lib/utils";
 import { buttonVariants } from "../../components/ui/button";
@@ -9,11 +9,12 @@ import { useMusicStore } from "../../stores/useMusicStore";
 import { useEffect } from "react";
 
 const LeftSidebar = () => {
-	const { albums, fetchAlbums, isLoading } = useMusicStore();
+	const { albums, fetchAlbums, playlists, fetchPlaylists, createPlaylist, isLoading } = useMusicStore();
 
 	useEffect(() => {
 		fetchAlbums();
-	}, [fetchAlbums]);
+		fetchPlaylists();
+	}, [fetchAlbums, fetchPlaylists]);
 
 	console.log({ albums });
 
@@ -60,6 +61,15 @@ const LeftSidebar = () => {
 						<Library className='size-5 mr-2' />
 						<span className='hidden md:inline'>Playlists</span>
 					</div>
+					<SignedIn>
+						<PlusIcon
+							className='size-5 text-zinc-400 hover:text-white cursor-pointer transition-colors'
+							onClick={() => {
+								const name = prompt("Enter playlist name:");
+								if (name) createPlaylist(name);
+							}}
+						/>
+					</SignedIn>
 				</div>
 
 				<ScrollArea className='h-[calc(100vh-300px)]'>
@@ -67,24 +77,47 @@ const LeftSidebar = () => {
 						{isLoading ? (
 							<PlaylistSkeleton />
 						) : (
-							albums.map((album) => (
-								<Link
-									to={`/albums/${album._id}`}
-									key={album._id}
-									className='p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer'
-								>
-									<img
-										src={album.imageUrl}
-										alt='Playlist img'
-										className='size-12 rounded-md flex-shrink-0 object-cover'
-									/>
+							<>
+								{/* Albums */}
+								{albums.map((album) => (
+									<Link
+										to={`/albums/${album._id}`}
+										key={album._id}
+										className='p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer'
+									>
+										<img
+											src={album.imageUrl}
+											alt='Playlist img'
+											className='size-12 rounded-md flex-shrink-0 object-cover'
+										/>
 
-									<div className='flex-1 min-w-0 hidden md:block'>
-										<p className='font-medium truncate'>{album.title}</p>
-										<p className='text-sm text-zinc-400 truncate'>Album • {album.artist}</p>
-									</div>
-								</Link>
-							))
+										<div className='flex-1 min-w-0 hidden md:block'>
+											<p className='font-medium truncate'>{album.title}</p>
+											<p className='text-sm text-zinc-400 truncate'>Album • {album.artist}</p>
+										</div>
+									</Link>
+								))}
+
+								{/* User Playlists */}
+								{playlists.map((playlist) => (
+									<Link
+										to={`/playlists/${playlist._id}`}
+										key={playlist._id}
+										className='p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer'
+									>
+										<img
+											src={playlist.imageUrl}
+											alt='Playlist img'
+											className='size-12 rounded-md flex-shrink-0 object-cover'
+										/>
+
+										<div className='flex-1 min-w-0 hidden md:block'>
+											<p className='font-medium truncate'>{playlist.name}</p>
+											<p className='text-sm text-zinc-400 truncate'>Playlist • You</p>
+										</div>
+									</Link>
+								))}
+							</>
 						)}
 					</div>
 				</ScrollArea>

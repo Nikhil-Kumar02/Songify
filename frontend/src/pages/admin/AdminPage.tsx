@@ -5,7 +5,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../components/ui/tabs";
-import { useAuthStore } from "../../stores/useAuthSore";
+import { useAuthStore } from "../../stores/useAuthStore";
 import DashBoardStats from "./components/DashBoardStats";
 import Header from "./components/Header";
 import SongsTabContent from "./components/SongsTabContent";

@@ -12,8 +12,11 @@ import {
   SkipBack,
   SkipForward,
   Volume1,
+  Heart,
 } from "lucide-react";
 import { Slider } from "../../components/ui/slider";
+import { useMusicStore } from "../../stores/useMusicStore";
+import { cn } from "../../lib/utils";
 
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -24,6 +27,7 @@ const formatTime = (seconds: number) => {
 const PlayBackControls = () => {
   const { currentSong, isPlaying, togglePlay, playNext, playPrevious } =
     usePlayerStore();
+  const { toggleLike, likedSongs } = useMusicStore();
 
   const [volume, setVolume] = useState(75);
   const [currentTime, setCurrentTime] = useState(0);
@@ -81,6 +85,24 @@ const PlayBackControls = () => {
                   {currentSong.artist}
                 </div>
               </div>
+              <Button
+                size="icon"
+                variant="ghost"
+                className={cn(
+                  "hover:text-white shrink-0",
+                  likedSongs.some((s) => s._id === currentSong._id)
+                    ? "text-emerald-500 hover:text-emerald-600"
+                    : "text-zinc-400"
+                )}
+                onClick={() => toggleLike(currentSong._id)}
+              >
+                <Heart
+                  className={cn(
+                    "size-5",
+                    likedSongs.some((s) => s._id === currentSong._id) && "fill-current"
+                  )}
+                />
+              </Button>
             </>
           )}
         </div>

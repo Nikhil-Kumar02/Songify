@@ -2,6 +2,10 @@ import { Button } from "../../../components/ui/button";
 import { Song } from "../../../types";
 import PlayButton from "./PlayButton";
 import SectionGridSkeleton from "./SectionGridSkeleton";
+import { Heart } from "lucide-react";
+import { useMusicStore } from "../../../stores/useMusicStore";
+import { cn } from "../../../lib/utils";
+import AddToPlaylistDialog from "../../../components/AddToPlaylistDialog";
 
 type SectionGridProps = {
   title: string;
@@ -10,6 +14,8 @@ type SectionGridProps = {
 };
 
 const SectionGrid = ({ title, songs, isLoading }: SectionGridProps) => {
+  const { toggleLike, likedSongs } = useMusicStore();
+
   if (isLoading) {
     return <SectionGridSkeleton />;
   }
@@ -41,6 +47,23 @@ const SectionGrid = ({ title, songs, isLoading }: SectionGridProps) => {
                 />
                 <PlayButton song={song} />
               </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleLike(song._id);
+                }}
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-zinc-900/60 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-zinc-900"
+              >
+                <Heart
+                  className={cn(
+                    "size-4 transition-colors",
+                    likedSongs.some((s) => s._id === song._id)
+                      ? "fill-emerald-500 text-emerald-500"
+                      : "text-zinc-400"
+                  )}
+                />
+              </button>
+              <AddToPlaylistDialog songId={song._id} />
             </div>
             <h3 className="font-medium mb-2 truncate">{song.title}</h3>
             <p className="text-sm text-zinc-400 truncate">{song.artist}</p>

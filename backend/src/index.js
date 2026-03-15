@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 
+dotenv.config();
+
 import fileUpload from "express-fileupload";
 import path from "path";
 import cors from "cors";
@@ -22,15 +24,17 @@ import songRoutes from "./routes/song.route.js";
 import publicSongRoutes from "./routes/public-song.route.js";
 import statRoutes from "./routes/stat.route.js";
 import albumRoutes from "./routes/album.route.js";
+import playlistRoutes from "./routes/playlist.route.js";
 
-dotenv.config();
 
 const app = express();
 const __dirname = path.resolve();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 const httpServer = createServer(app);
 initializeSocket(httpServer);
+
+console.log("Starting server implementation...");
 
 app.use(
   cors({
@@ -77,6 +81,7 @@ app.use("/api/songs", songRoutes); // Admin Protected
 app.use("/api/public/songs", publicSongRoutes); // Public Songs
 app.use("/api/albums", albumRoutes);
 app.use("/api/stats", statRoutes);
+app.use("/api/playlists", playlistRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
@@ -95,7 +100,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-httpServer.listen(PORT, () => {
-  console.log("Server is running on port " + PORT);
+export default app;
+
+if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+  httpServer.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV}`);
+    connectDB();
+  });
+} else {
   connectDB();
-});
+}

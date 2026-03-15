@@ -3,8 +3,10 @@ import { useParams } from "react-router-dom";
 import { useMusicStore } from "../../stores/useMusicStore";
 import { ScrollArea } from "../../components/ui/scroll-area";
 import { Button } from "../../components/ui/button";
-import { Clock, Pause, Play } from "lucide-react";
+import { Clock, Heart, Pause, Play } from "lucide-react";
 import { usePlayerStore } from "../../stores/usePlayerStore";
+import AddToPlaylistDialog from "../../components/AddToPlaylistDialog";
+import { cn } from "../../lib/utils";
 
 export const formatDuration = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -14,7 +16,7 @@ export const formatDuration = (seconds: number) => {
 
 const AlbumPage = () => {
   const { albumId } = useParams();
-  const { fetchAlbumById, currentAlbum, isLoading } = useMusicStore();
+  const { fetchAlbumById, currentAlbum, isLoading, toggleLike, likedSongs } = useMusicStore();
   const { currentSong, isPlaying, playAlbum, togglePlay } = usePlayerStore();
 
   useEffect(() => {
@@ -155,8 +157,23 @@ const AlbumPage = () => {
                         <div className="flex items-center">
                           {song.createdAt.split("T")[0]}
                         </div>
-                        <div className="flex items-center">
-                          {formatDuration(song.duration)}
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleLike(song._id);
+                            }}
+                            className="text-zinc-400 hover:text-emerald-500 transition-colors"
+                          >
+                            <Heart
+                              className={cn(
+                                "size-4",
+                                likedSongs.some((s) => s._id === song._id) && "fill-emerald-500 text-emerald-500"
+                              )}
+                            />
+                          </button>
+                          <span>{formatDuration(song.duration)}</span>
+                          <AddToPlaylistDialog songId={song._id} />
                         </div>
                       </div>
                     );

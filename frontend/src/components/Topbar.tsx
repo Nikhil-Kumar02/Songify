@@ -5,12 +5,12 @@ import {
 import { LayoutDashboardIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import SignInOAuthButtons from "./SignInOAuthButtons";
-import { useAuthStore } from "../stores/useAuthSore";
+import { useAuthStore } from "../stores/useAuthStore";
 import { buttonVariants } from "./ui/button";
 import { cn } from "../lib/utils";
 
 const Topbar = () => {
-  const isAdmin = useAuthStore();
+  const { isAdmin } = useAuthStore();
 
   return (
     <div className="flex items-center justify-between p-4 sticky top-0 bg-zinc-900/75 backdrop-blur-md z-10">

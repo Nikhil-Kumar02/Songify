@@ -2,8 +2,9 @@ import { useAuth } from "@clerk/clerk-react";
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../lib/axios";
 import { Loader } from "lucide-react";
-import { useAuthStore } from "../stores/useAuthSore";
+import { useAuthStore } from "../stores/useAuthStore";
 import { useChatStore } from "../stores/useChatStore";
+import { useMusicStore } from "../stores/useMusicStore";
 const updateApiToken = (token: string | null) => {
   if (token) {
     axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -17,6 +18,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const { checkAdminStatus } = useAuthStore();
   const { initSocket, disconnectSocket } = useChatStore();
+  const { fetchLikedSongs } = useMusicStore();
 
   useEffect(() => {
     const initAuth = async () => {
@@ -29,6 +31,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // init socket
           if (userId) {
             initSocket(userId);
+            await fetchLikedSongs();
           }
         }
       } catch (error) {
